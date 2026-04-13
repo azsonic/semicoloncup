@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Intive Color Extractor</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .color-box { 
+            display: inline-block; 
+            width: 100px; 
+            height: 100px; 
+            margin: 10px; 
+            border: 1px solid #ccc;
+            text-align: center;
+            padding-top: 80px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Intive Brand Colors - Visual Extraction Tool</h1>
+    <p>Open intive.com in DevTools and run this in the console:</p>
+    
+    <pre>
+// Extract all computed colors from intive.com
+const colors = new Set();
+document.querySelectorAll('*').forEach(el => {
+    const style = window.getComputedStyle(el);
+    ['color', 'backgroundColor', 'borderColor'].forEach(prop => {
+        const val = style[prop];
+        if (val && val !== 'rgba(0, 0, 0, 0)' && val !== 'transparent') {
+            colors.add(val);
+        }
+    });
+});
+
+// Convert RGB to HEX
+function rgbToHex(rgb) {
+    const match = rgb.match(/\d+/g);
+    if (!match) return rgb;
+    return '#' + match.slice(0,3).map(x => {
+        const hex = parseInt(x).toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+    }).join('');
+}
+
+// Show unique colors
+Array.from(colors).map(c => {
+    return c.includes('rgb') ? rgbToHex(c) : c;
+}).filter(c => c.startsWith('#')).forEach(c => {
+    console.log(c);
+});
+    </pre>
+
+    <h2>Manual Instructions:</h2>
+    <ol>
+        <li>Open https://intive.com in Chrome/Edge</li>
+        <li>Press F12 to open DevTools</li>
+        <li>Go to Console tab</li>
+        <li>Paste the script above</li>
+        <li>Copy the hex colors that appear</li>
+        <li>Save them to <code>BRAND_COLORS.md</code></li>
+    </ol>
+
+    <h2>Expected Intive Brand Colors (from visual inspection):</h2>
+    <div id="colors"></div>
+
+    <script>
+        // Based on intive.com visual inspection
+        const expectedColors = [
+            { name: 'Primary Dark', hex: '#1a1a1a', usage: 'Headers, text' },
+            { name: 'Primary Blue', hex: '#0066CC', usage: 'Links, CTAs' },
+            { name: 'Accent Green', hex: '#00D68F', usage: 'Highlights, success' },
+            { name: 'Background', hex: '#FFFFFF', usage: 'Main background' },
+            { name: 'Gray Light', hex: '#F5F5F5', usage: 'Sections, cards' },
+            { name: 'Gray Medium', hex: '#666666', usage: 'Secondary text' },
+            { name: 'Gray Border', hex: '#E0E0E0', usage: 'Borders, dividers' }
+        ];
+
+        const container = document.getElementById('colors');
+        expectedColors.forEach(color => {
+            const div = document.createElement('div');
+            div.className = 'color-box';
+            div.style.backgroundColor = color.hex;
+            div.style.color = color.hex.includes('FFF') || color.hex.includes('F5F5') ? '#000' : '#fff';
+            div.innerHTML = `
+                <div><strong>${color.name}</strong></div>
+                <div>${color.hex}</div>
+                <div style="font-size: 9px">${color.usage}</div>
+            `;
+            container.appendChild(div);
+        });
+    </script>
+</body>
+</html>
